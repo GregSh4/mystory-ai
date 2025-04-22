@@ -1,5 +1,7 @@
 export type ImageGenerationRequest = {
   prompt: string;
+  size?: string;   // ✅ optional, or remove ? if always required
+  style?: string;  // ✅ optional
 };
 
 export function generateImage(request: ImageGenerationRequest) {
