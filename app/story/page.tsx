@@ -7,6 +7,7 @@ export default function StoryPage() {
   const router = useRouter();
   const [story, setStory] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     const storedStory = localStorage.getItem('generatedStory');
@@ -19,7 +20,6 @@ export default function StoryPage() {
 
     setStory(storedStory);
 
-    // Generate image
     const { character, theme, setting } = JSON.parse(rawPrompt);
     const imagePrompt = `An illustration of a children's story featuring a character named ${character} in a ${setting}. Theme: ${theme}. Fantasy, colorful, storybook style.`;
 
@@ -45,6 +45,44 @@ export default function StoryPage() {
       });
   }, [router]);
 
+  const speakStory = async () => {
+    if (!story) return;
+
+    setIsSpeaking(true);
+
+    try {
+      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/exAV9GRbXWB0kD2ECr4B/stream', {
+        method: 'POST',
+        headers: {
+          'xi-api-key': process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY!,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: story,
+          model_id: "eleven_monolingual_v1",
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75
+          }
+        })
+      });
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+      };
+
+    } catch (err) {
+      console.error("Narration failed", err);
+      setIsSpeaking(false);
+      alert("Narration failed.");
+    }
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-start p-6 bg-gradient-to-b from-white to-blue-50 text-gray-800">
       <div className="max-w-2xl w-full">
@@ -64,12 +102,19 @@ export default function StoryPage() {
           </div>
         )}
 
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-8 gap-4">
           <button
             onClick={() => router.push('/')}
             className="kid-button bg-primary hover:bg-primary-dark"
           >
             Create Another Story
+          </button>
+          <button
+            onClick={speakStory}
+            disabled={isSpeaking}
+            className="kid-button bg-green-500 hover:bg-green-600"
+          >
+            {isSpeaking ? "Narrating..." : "🔊 Play Narration"}
           </button>
         </div>
       </div>
