@@ -6,7 +6,12 @@ import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito" });
-const comicNeue = Comic_Neue({ weight: ["300", "400", "700"], variable: "--font-comic" });
+const comicNeue = Comic_Neue({
+  weight: ["300", "400", "700"],
+  subsets: ["latin"],
+  variable: "--font-comic"
+});
+
 
 export const metadata: Metadata = {
   title: "MyStory AI - Stories for Kids",
