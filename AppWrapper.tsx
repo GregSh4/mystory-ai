@@ -1,5 +1,5 @@
 import React from 'react';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import PWAInstallPrompt from "./PWAInstallPrompt";
 
 // App wrapper component to include PWA functionality
 export default function AppWrapper({ children }) {
