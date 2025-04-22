@@ -6,14 +6,43 @@ import { useRouter } from 'next/navigation';
 export default function StoryPage() {
   const router = useRouter();
   const [story, setStory] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const storedStory = localStorage.getItem('generatedStory');
-    if (!storedStory) {
+    const rawPrompt = localStorage.getItem('storyPrompt');
+
+    if (!storedStory || !rawPrompt) {
       router.push('/');
-    } else {
-      setStory(storedStory);
+      return;
     }
+
+    setStory(storedStory);
+
+    // Generate image
+    const { character, theme, setting } = JSON.parse(rawPrompt);
+    const imagePrompt = `An illustration of a children's story featuring a character named ${character} in a ${setting}. Theme: ${theme}. Fantasy, colorful, storybook style.`;
+
+    fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_GPT_API_KEY}`
+      },
+      body: JSON.stringify({
+        prompt: imagePrompt,
+        n: 1,
+        size: '512x512'
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        const url = data?.data?.[0]?.url;
+        if (url) setImageUrl(url);
+      })
+      .catch(err => {
+        console.error("Image generation failed", err);
+      });
   }, [router]);
 
   return (
@@ -21,8 +50,14 @@ export default function StoryPage() {
       <div className="max-w-2xl w-full">
         <h1 className="text-4xl font-bold text-primary mb-6 text-center">📖 Your Story</h1>
 
+        {imageUrl && (
+          <div className="flex justify-center mb-6">
+            <img src={imageUrl} alt="Story illustration" className="rounded-xl shadow-md w-full max-w-sm" />
+          </div>
+        )}
+
         {!story ? (
-          <p className="text-lg">Loading...</p>
+          <p className="text-lg">Loading story...</p>
         ) : (
           <div className="whitespace-pre-line text-lg leading-relaxed bg-white p-6 rounded-xl shadow-md">
             {story}
