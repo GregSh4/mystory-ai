@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Nunito, Comic_Neue } from "next/font/google";
 import "./globals.css";
-import AppWrapper from "@/components/AppWrapper";
+import AppWrapper from "../AppWrapper";
 import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
