@@ -14,9 +14,10 @@ export default function StoryPage() {
     const rawPrompt = localStorage.getItem('storyPrompt');
 
     if (!storedStory || !rawPrompt) {
-      router.push('/');
-      return;
-    }
+  console.warn("No story or prompt found in localStorage.");
+  return;
+}
+
 
     setStory(storedStory);
 
