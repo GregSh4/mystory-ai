@@ -12,7 +12,6 @@ const comicNeue = Comic_Neue({
   variable: "--font-comic"
 });
 
-
 export const metadata: Metadata = {
   title: "MyStory AI - Stories for Kids",
   description: "AI-powered story creator for kids aged 4-8",
